@@ -24,6 +24,9 @@ set(ZIP_VERSION_MINOR "0")
 set(ZIP_VERSION_PATCH "0")
 set(ZIP_VERSION "${ZIP_VERSION_MAJOR}.${ZIP_VERSION_MINOR}.${ZIP_VERSION_PATCH}")
 
+
+option(BUILD_TESTS "Build test executable" OFF)
+
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${zip_SOURCE_DIR}/cmake)
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
@@ -33,21 +36,23 @@ endif ()
 find_package(ZIP REQUIRED)
 find_package(Doxygen QUIET)
 
-add_subdirectory(gtest)
+if(BUILD_TESTS)
+	add_subdirectory(gtest)
 
-enable_testing()
-add_executable(
-    zip
-    ${zip_SOURCE_DIR}/zip.hpp
-    ${zip_SOURCE_DIR}/test/main.cpp
-    ${zip_SOURCE_DIR}/INSTALL.md
-    ${zip_SOURCE_DIR}/LICENSE.md
-    ${zip_SOURCE_DIR}/README.md
-)
-target_link_libraries(zip gtest ${ZIP_LIBRARIES})
-target_include_directories(zip PRIVATE ${zip_SOURCE_DIR} ${ZIP_INCLUDE_DIRS})
-target_compile_definitions(zip PRIVATE DIRECTORY=\"${zip_SOURCE_DIR}/test/data/\")
-add_test(NAME zip COMMAND zip)
+	enable_testing()
+	add_executable(
+		zip
+		${zip_SOURCE_DIR}/zip.hpp
+		${zip_SOURCE_DIR}/test/main.cpp
+		${zip_SOURCE_DIR}/INSTALL.md
+		${zip_SOURCE_DIR}/LICENSE.md
+		${zip_SOURCE_DIR}/README.md
+	)
+	target_link_libraries(zip gtest ${ZIP_LIBRARIES})
+	target_include_directories(zip PRIVATE ${zip_SOURCE_DIR} ${ZIP_INCLUDE_DIRS})
+	target_compile_definitions(zip PRIVATE DIRECTORY=\"${zip_SOURCE_DIR}/test/data/\")
+	add_test(NAME zip COMMAND zip)
+endif(BUILD_TESTS)
 
 if (DOXYGEN_FOUND)
     if (NOT DOXYGEN_DOT_FOUND)
